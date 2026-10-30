@@ -18,6 +18,15 @@ Requires VS Code 1.110+, Python 3.12+ and Git. SDK sessions require GitHub Copil
 access. Task management and browsing do not make model calls. Building requires
 Node.js 22.12+.
 
+Install the Windows x64 or macOS Apple Silicon build from the
+[Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=project-sdlc.copilot-sdk-sdlc):
+
+```sh
+code --install-extension project-sdlc.copilot-sdk-sdlc
+```
+
+To build and install from source instead:
+
 ```sh
 npm install
 npm run check
