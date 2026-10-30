@@ -1,4 +1,5 @@
-import { mkdir, readFile, writeFile, rename, rm } from 'node:fs/promises';
+import { atomicReplace } from '../files/atomic-replace';
+import { mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import type { StudioRecord, StudioStore } from '../../contracts/studio';
@@ -91,7 +92,7 @@ export class FileStudioStore implements StudioStore {
             const output = columns.join('\t') + '\n' + records.map(r => columns.map(k => cell(k === 'data' ? JSON.stringify(r.data) : r[k as keyof StudioRecord])).join('\t')).join('\n') + '\n';
             const temporary = path.join(directory, `records.${process.pid}.tmp`);
             await writeFile(temporary, output);
-            await rename(temporary, path.join(directory, 'records.tsv'));
+            await atomicReplace(temporary, path.join(directory, 'records.tsv'));
             return result;
         }
         finally {
