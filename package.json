@@ -309,8 +309,8 @@
       {
         "name": "sdlc_questions",
         "displayName": "SDLC: Questions and decisions",
-        "modelDescription": "Record a question with at least two options and a recommendation, or record a human answer. SDK agents may ask but cannot answer on the human\u2019s behalf.",
-        "userDescription": "Record a question with at least two options and a recommendation, or record a human answer. SDK agents may ask but cannot answer on the human\u2019s behalf.",
+        "modelDescription": "Record a question with at least two options and a recommendation, or record a human answer. SDK agents may ask but cannot answer on the human’s behalf.",
+        "userDescription": "Record a question with at least two options and a recommendation, or record a human answer. SDK agents may ask but cannot answer on the human’s behalf.",
         "canBeReferencedInPrompt": true,
         "toolReferenceName": "sdlcquestions",
         "inputSchema": {
@@ -572,8 +572,8 @@
       {
         "name": "sdlc_initiatives",
         "displayName": "SDLC: Initiatives",
-        "modelDescription": "Create or revise a user-requested initiative/brief. Record the master\u2019s quick Fibonacci estimate and rationale in body; unknown estimates stay absent. This is exploration, not implementation approval.",
-        "userDescription": "Create or revise a user-requested initiative/brief. Record the master\u2019s quick Fibonacci estimate and rationale in body; unknown estimates stay absent. This is exploration, not implementation approval.",
+        "modelDescription": "Create or revise a user-requested initiative/brief. Record the master’s quick Fibonacci estimate and rationale in body; unknown estimates stay absent. This is exploration, not implementation approval.",
+        "userDescription": "Create or revise a user-requested initiative/brief. Record the master’s quick Fibonacci estimate and rationale in body; unknown estimates stay absent. This is exploration, not implementation approval.",
         "canBeReferencedInPrompt": true,
         "toolReferenceName": "sdlcinitiatives",
         "inputSchema": {
