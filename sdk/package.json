@@ -1,0 +1,10 @@
+{
+  "name": "@copilot-sdlc/api",
+  "version": "1.2.0",
+  "description": "Type-only public contract for Copilot SDLC companion modules.",
+  "types": "api.d.ts",
+  "files": [
+    "**/*.d.ts"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "project_info",
+  "displayName": "Informacje o projekcie",
+  "description": "Read the project's active task queue as TSV using the standalone Python harness.",
+  "readOnly": true,
+  "inputSchema": { "type": "object", "properties": {}, "additionalProperties": false },
+  "command": ["python3", "${projectRoot}/tools/work-items.py"],
+  "timeoutSeconds": 30
+}

@@ -1,0 +1,21 @@
+{
+  "name": "quality",
+  "displayName": "quality",
+  "description": "Companion module for the Copilot SDLC workbench.",
+  "version": "0.1.0",
+  "publisher": "example",
+  "license": "MIT",
+  "engines": { "vscode": "^1.110.0" },
+  "main": "./dist/extension.cjs",
+  "activationEvents": ["onStartupFinished"],
+  "extensionDependencies": ["project-sdlc.copilot-sdk-sdlc"],
+  "extensionKind": ["workspace"],
+  "capabilities": { "untrustedWorkspaces": { "supported": false }, "virtualWorkspaces": false },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=dist/extension.cjs",
+    "vscode:prepublish": "npm run check && npm run build",
+    "package": "vsce package --allow-missing-repository"
+  },
+  "devDependencies": { "@types/vscode": "^1.110.0", "typescript": "^5.9.0", "esbuild": "^0.25.0", "@vscode/vsce": "^3.6.0" }
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "./config.schema.json",
+  "version": 1,
+  "models": {
+    "planner": "auto",
+    "worker": "auto",
+    "judge": "auto"
+  },
+  "session": {
+    "timeoutSeconds": 900,
+    "maxOutputTokens": 60000,
+    "maxPremiumRequests": null,
+    "permissions": "bypass"
+  },
+  "gates": [],
+  "workflow": {
+    "agentsByStatus": {
+      "ready": [
+        "worker",
+        "planner"
+      ],
+      "active": [
+        "worker"
+      ],
+      "review": [
+        "judge"
+      ],
+      "changes": [
+        "worker"
+      ],
+      "blocked": [],
+      "accepted": [],
+      "closed": []
+    }
+  },
+  "execution": {
+    "default": "copilot-sdk",
+    "roles": {},
+    "options": {}
+  }
+}

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+out/
+*.vsix
+__pycache__/
+.DS_Store
+.vscode-test/
+coverage/
+
+.work-item/
+.env
+.env.*
+*.log

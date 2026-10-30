@@ -1,0 +1,16 @@
+{
+  "layers": {
+    "contracts": { "imports": ["contracts"], "external": [] },
+    "domain": { "imports": ["contracts", "domain"], "external": [] },
+    "application": { "imports": ["contracts", "domain", "application"], "external": [] },
+    "features": { "imports": ["contracts", "domain", "application", "features"], "external": [] },
+    "infrastructure": { "imports": ["contracts", "domain", "application", "infrastructure"], "external": ["node:*", "ajv", "yaml"] },
+    "integrations": { "imports": ["contracts", "integrations"], "external": ["node:*", "@github/copilot-sdk"] },
+    "host": { "imports": ["contracts", "domain", "application", "host", "ui"], "external": ["vscode", "node:path"] },
+    "ui": { "imports": ["contracts", "ui"], "external": [] },
+    "bootstrap": { "imports": ["contracts", "domain", "application", "features", "infrastructure", "integrations", "host", "ui", "bootstrap"], "external": ["vscode", "node:*"] }
+  },
+  "entrypoints": { "extension.ts": ["bootstrap"], "api.ts": ["contracts"] },
+  "fileExternals": { "ui/webview/shell.ts": ["node:crypto"] },
+  "isolatedModules": ["features", "integrations"]
+}

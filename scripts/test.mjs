@@ -1,0 +1,11 @@
+import { spawnSync } from 'node:child_process';
+import { readdirSync } from 'node:fs';
+const candidates = process.env.SDLC_TEST_PYTHON ? [[process.env.SDLC_TEST_PYTHON]] : process.platform === 'win32' ? [['py', '-3'], ['python'], ['python3']] : [['python3'], ['python']];
+const python = candidates.find(([command, ...args]) => spawnSync(command, [...args, '--version'], { encoding: 'utf8' }).status === 0);
+if (!python) throw new Error('Python 3 is required. Set SDLC_TEST_PYTHON to its executable path.');
+const [command, ...args] = python;
+const unit = spawnSync(command, [...args, '-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_*.py'], { stdio: 'inherit' });
+if (unit.status !== 0) process.exit(unit.status || 1);
+const files = readdirSync('tests').filter(name => name.endsWith('.test.ts')).map(name => `tests/${name}`);
+const result = spawnSync(process.execPath, ['--import', 'tsx', '--test', ...files], { stdio: 'inherit' });
+process.exit(result.status || (result.error ? 1 : 0));
