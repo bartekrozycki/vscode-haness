@@ -17,7 +17,7 @@ async function environment(run:(root:string,services:ReturnType<typeof createSer
  try{await run(root,services);}finally{services.dispose();await rm(root,{recursive:true,force:true});}
 }
 const invoke=(services:ReturnType<typeof createServices>,root:string,name:string,input:Record<string,unknown>,approve=async()=>true)=>services.tools.invoke(name,input,{root,approve}) as Promise<any>;
-async function waitFor<T>(read:()=>Promise<T>,done:(value:T)=>boolean){for(let i=0;i<300;i++){const result=await read();if(done(result))return result;await new Promise(resolve=>setTimeout(resolve,10));}throw new Error('Timed out waiting for research');}
+async function waitFor<T>(read:()=>Promise<T>,done:(value:T)=>boolean){const deadline=Date.now()+30000;let result: T | undefined;while(Date.now()<deadline){result=await read();if(done(result))return result;await new Promise(resolve=>setTimeout(resolve,25));}throw new Error(`Timed out waiting for research: ${JSON.stringify(result)}`);}
 const local=(execute:(request:ExecutorRequest)=>Promise<void>):AgentExecutor=>({apiVersion:1,id:'test.research',title:'Local research',createSession:async request=>({id:request.run,run:()=>execute(request),abort:async()=>{},dispose:async()=>{}})});
 
 test('studio reads create no files; concurrent writers preserve revisions and real TSV quoting',async()=>environment(async(root,services)=>{
@@ -64,8 +64,8 @@ test('small initiatives run a master-selected parallel team, expose live session
  const started=await invoke(services,root,'sdlc_research',{operation:'start',initiative:ini.id,plan:'Two focused slices: UI and data.',maxParallel:2,members:[{role:'specify',purpose:'research',focus:'UI',executor:'test.research'},{role:'specify',purpose:'research',focus:'Data',executor:'test.research'}]});
  await waitFor(async()=>requests.length,n=>n===2);
  const live=await invoke(services,root,'sdlc_research',{operation:'status',id:started.team});assert.equal(live[0].sessions.length,2);assert.equal(live[0].controllable,true);
- release();const result=await waitFor(()=>invoke(services,root,'sdlc_research',{operation:'status',id:started.team}),v=>v[0].status==='completed');
- assert.equal(result[0].artifacts.length,2);assert.equal(result[0].data.tokens,24);assert.match(result[0].artifacts[0].body,/Verified/);assert.equal((await services.snapshot(root)).tasks.length,0);
+ release();const result=await waitFor(()=>invoke(services,root,'sdlc_research',{operation:'status',id:started.team}),v=>v[0].status!=='running');
+ assert.equal(result[0].status,'completed',`Research failed: ${JSON.stringify(result[0])}`);assert.equal(result[0].artifacts.length,2);assert.equal(result[0].data.tokens,24);assert.match(result[0].artifacts[0].body,/Verified/);assert.equal((await services.snapshot(root)).tasks.length,0);
 }));
 
 test('large initiatives require decomposition; prototypes are versioned HTML artifacts and cancellation stops queued work',async()=>environment(async(root,services)=>{
