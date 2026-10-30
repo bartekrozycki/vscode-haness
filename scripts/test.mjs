@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { readdirSync } from 'node:fs';
-const candidates = process.env.SDLC_TEST_PYTHON ? [[process.env.SDLC_TEST_PYTHON]] : process.platform === 'win32' ? [['py', '-3'], ['python'], ['python3']] : [['python3'], ['python']];
+const candidates = process.env.SDLC_TEST_PYTHON ? [[process.env.SDLC_TEST_PYTHON]] : process.platform === 'win32' ? [['python'], ['py', '-3'], ['python3']] : [['python3'], ['python']];
 const python = candidates.find(([command, ...args]) => spawnSync(command, [...args, '--version'], { encoding: 'utf8' }).status === 0);
 if (!python) throw new Error('Python 3 is required. Set SDLC_TEST_PYTHON to its executable path.');
 const [command, ...args] = python;
