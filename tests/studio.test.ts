@@ -123,3 +123,9 @@ test('research polling needs no mutation confirmation while start/stop and gates
  assert.equal(toolMutates(research,{operation:'start'}),true);assert.equal(toolMutates(research,{operation:'stop'}),true);
  assert.equal(toolMutates(tasks,{operation:'gates'}),true);assert.equal(toolMutates(tasks,{operation:'read'}),false);
 });
+
+ test('project tool listing does not require mutation confirmation, invocation does', () => {
+ const projectTool = catalog.find(t => t.name === 'sdlc_project_tool')!;
+ assert.equal(toolMutates(projectTool, {operation: 'list'}), false);
+ assert.equal(toolMutates(projectTool, {operation: 'invoke', name: 'example'}), true);
+ });

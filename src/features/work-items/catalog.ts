@@ -24,7 +24,7 @@ export const catalog: ToolDefinition[] = [
     { name: 'sdlc_run', displayName: 'SDLC: Agent session', readOnly: false,
         description: 'Start one fresh session through the configured agent executor (Copilot SDK by default) for a task, only on explicit user request. Role must be allowed by workflow.agentsByStatus for the current task status; read sdlc_metrics for available agentActions. Workers need prior human task approval. AI executors may consume provider usage. No automatic background runs.',
         inputSchema: schema({ id: str('WI-NNN'), role: str('Agent suffix from .github/agents/sdlc-ROLE.agent.md; defaults: planner, worker, judge'), prompt: str('Optional additional instructions'), executor: str('Optional explicit executor ID; otherwise use the agent / role / project configuration') }, ['id', 'role']) },
-    { name: 'sdlc_project_tool', displayName: 'SDLC: Project tool', readOnly: false,
+    { name: 'sdlc_project_tool', readOnlyOperations: ['list'], displayName: 'SDLC: Project tool', readOnly: false,
         description: 'List or invoke project-defined tools from .copilot-sdlc/tools/*.json. Use list first. Definitions contain JSON Schema and an argv command. Shell interpolation is never used.',
         inputSchema: schema({ operation: { enum: ['list', 'invoke'] }, name: str('Project tool name'), input: { type: 'object', additionalProperties: true } }, ['operation']) },
 ];

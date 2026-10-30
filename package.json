@@ -2,7 +2,7 @@
   "name": "copilot-sdk-sdlc",
   "displayName": "Copilot SDLC",
   "description": "Extensible agent workbench: modular executors, project-owned tools and agents, tasks and live sessions.",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "publisher": "project-sdlc",
   "license": "MIT",
   "engines": {

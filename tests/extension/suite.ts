@@ -27,6 +27,9 @@ export async function run() {
   await vscode.commands.executeCommand('copilotSdlc.initialize');
   const config = JSON.parse(await readFile(path.join(folder, '.copilot-sdlc/config.json'), 'utf8'));
   assert.equal(config.version, 1);
+  assert.match(await readFile(path.join(folder,'.github/skills/harness-workbench/SKILL.md'),'utf8'),/references\/tools.md/);
+  const reference=await readFile(path.join(folder,'.github/skills/harness-workbench/references/tools.md'),'utf8');
+  for (const definition of catalog) assert.ok(reference.includes(definition.name), `Skill documents ${definition.name}`);
   await vscode.commands.executeCommand('copilotSdlc.openTsv', 'tasks');
   if (process.env.SDLC_VISUAL_CHECK === '1') {
     const client = new HarnessClient(folder);

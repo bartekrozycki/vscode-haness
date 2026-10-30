@@ -1,3 +1,4 @@
+import { proposeCopilotSettings, applyCopilotSettings } from './copilot-settings';
 import * as vscode from 'vscode';
 import type { AppServices } from '../../application/services';
 import type { ConnectionMetadata } from '../../contracts/connections';
@@ -18,6 +19,28 @@ export function createIntegrationActions(deps: Dependencies) {
     const automationState = async (root: string, error?: string) => post(root, { type: 'automation', error, workflowActions: (await services.automation?.list(root) || []).map(request => ({ ...request, state: request.status, title: request.trigger?.taskId || request.trigger?.researchFocus || request.publication?.operation || request.kind })) });
     return async (root: string, message: Record<string, unknown>) => {
         const action = String(message.action);
+        if (action === 'openToolSkill') {
+            deps.trust();
+            const file = await services.files.resolve(root, '.github/skills/harness-workbench/SKILL.md');
+            try { await vscode.workspace.fs.stat(vscode.Uri.file(file)); }
+            catch (error) {
+                if ((error as vscode.FileSystemError).code !== 'FileNotFound') throw error;
+                await vscode.window.showInformationMessage('Tool skill not found. Initialize the project harness to create it, then open it from Settings.');
+                return;
+            }
+            await vscode.window.showTextDocument(vscode.Uri.file(file), { preview: false });
+            return;
+        }
+        if (action === 'copilotSettingsReview') {
+            deps.trust();
+            const proposal = proposeCopilotSettings(root);
+            if (!proposal) { await vscode.window.showInformationMessage('No disabled skill-discovery setting was found. Use native sdlc_* tools; terminal approval rules do not control custom project-tool confirmations.'); return; }
+            const document = await vscode.workspace.openTextDocument({language:'json',content:JSON.stringify([proposal.patch],null,2)});
+            await vscode.window.showTextDocument(document,{preview:false});
+            if (await vscode.window.showInformationMessage('Apply this Copilot settings patch?', {modal:true,detail:'Enable discovery of project skills for this folder. Existing settings and tool/terminal approvals are preserved.'}, 'Apply patch') === 'Apply patch') await applyCopilotSettings(root,proposal);
+            return;
+        }
+
         if (action.startsWith('connection')) {
             try {
                 deps.trust(); if (!services.connections) throw new Error('Connections are unavailable.');

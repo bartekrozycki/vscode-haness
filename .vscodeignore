@@ -21,3 +21,5 @@ dist/catalog.cjs
 dist/*.map
 
 resources/upstream/**
+
+.mailmap

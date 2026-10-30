@@ -8,6 +8,7 @@ import { TestToolRegistry as ToolRegistry, testRunner, testRunnerServices } from
 import { Usage, summarize } from '../src/domain/usage';
 import { dashboardHtml } from './support/dashboard';
 import type { Snapshot } from '../src/contracts/model';
+import { catalog } from '../src/bootstrap/catalog';
 
 const resources = path.resolve('resources');
 async function project(fn: (root: string, client: HarnessClient) => Promise<void>) {
@@ -94,4 +95,22 @@ test('extension API accepts custom tools with disposable registration', async ()
   assert.deepEqual(await registry.invoke('test_plugin', {}, { root }), { ok: true });
   handle.dispose();
   await assert.rejects(registry.invoke('test_plugin', {}, { root }), /Unknown tool/);
+}));
+
+test('initialization adds the workbench skill to existing projects while preserving project files', async () => project(async root => {
+  await initialize(root, resources);
+  const agent = path.join(root, '.github/agents/sdlc-worker.agent.md');
+  await writeFile(agent, 'Existing project agent');
+  const skill = path.join(root, '.github/skills/harness-workbench');
+  await rm(skill, { recursive: true });
+  const result = await initialize(root, resources);
+  assert.equal(await readFile(agent, 'utf8'), 'Existing project agent');
+  assert.ok(result.preserved.includes('.github/agents/sdlc-worker.agent.md'));
+  assert.ok(result.created.includes('.github/skills/harness-workbench/SKILL.md'));
+  assert.ok(result.created.includes('.github/skills/harness-workbench/references/tools.md'));
+  const entry = await readFile(path.join(skill, 'SKILL.md'), 'utf8');
+  const reference = await readFile(path.join(skill, 'references/tools.md'), 'utf8');
+  assert.match(entry, /references\/tools\.md/);
+  assert.equal(catalog.length, 18);
+  for (const definition of catalog) assert.ok(reference.includes(`\`${definition.name}\``), `${definition.name} is documented`);
 }));

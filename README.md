@@ -23,7 +23,7 @@ npm install
 npm run check
 npm test
 npm run package
-code --install-extension copilot-sdk-sdlc-darwin-arm64-0.7.1.vsix --force
+code --install-extension copilot-sdk-sdlc-darwin-arm64-0.7.2.vsix --force
 ```
 
 Packaging targets the current host platform and architecture because the SDK
@@ -271,3 +271,15 @@ human review. Publishing uses a separate native confirmation of the complete
 destination and payload, independent of executor permission bypass.
 
 The [integration review record](docs/integration-review.md) documents all three review cycles and verification limits.
+
+## Copilot tool skill and settings
+
+The project-owned `.github/skills/harness-workbench/SKILL.md` includes a concrete
+reference for all 18 native tools and example inputs. Explicitly initialize an
+existing project again to add this new skill; existing files are preserved.
+Prefer native `sdlc_tasks` and `sdlc_metrics` calls over terminal commands.
+The custom `project_info` command remains subject to its own confirmation.
+
+Settings contains **Review Copilot settings patch**, which previews a folder-scoped
+change only when agent skills are disabled. It preserves terminal and publication
+approvals. See [Copilot settings](docs/copilot-settings.md).
