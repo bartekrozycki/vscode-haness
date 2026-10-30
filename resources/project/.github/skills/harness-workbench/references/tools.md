@@ -23,7 +23,7 @@ Example: `sdlc_update_task` with `{"operation":"create","title":"Add search","re
 - `sdlc_research`: `operation` start/status/stop; `id`, `initiative`, `title`, `plan`, `maxParallel` (1–5), `maxTokens` (1–1000000), `timeoutSeconds` (5–1800), `members` (1–5 objects with `role` specify/design/prototype, `focus`, `purpose` research/design/decomposition/prototype, optional `executor`). Start returns immediately; status shows partial reports, usage and artifacts; stop cancels the team. Research agents cannot implement or approve; estimates above 13 require decomposition.
 - `sdlc_suggest_tasks`: `source` and `suggestions` (1–20 objects with `title`, `requirements`, optional Fibonacci `estimate`); creates drafts for review following requested skill/research work.
 
-Example `sdlc_research`: `{"operation":"start","initiative":"INIT-1","title":"Explore search","plan":"Compare options and acceptance risks","maxParallel":1,"maxTokens":10000,"timeoutSeconds":300,"members":[{"role":"specify","focus":"Search requirements","purpose":"research"}]}`. Use the returned team ID in `{"operation":"status","id":"RESEARCH-1"}`. Limits bound research; they do not grant human approval or SDK permissions.
+Example `sdlc_research`: `{"operation":"start","initiative":"INI-001","title":"Explore search","plan":"Compare options and acceptance risks","maxParallel":1,"maxTokens":10000,"timeoutSeconds":300,"members":[{"role":"specify","focus":"Search requirements","purpose":"research"}]}`. Use the returned team ID in `{"operation":"status","id":"TEAM-001"}`. Limits bound research; they do not grant human approval or SDK permissions.
 
 ## Connections, monitors and automation
 
@@ -31,6 +31,34 @@ Example `sdlc_research`: `{"operation":"start","initiative":"INIT-1","title":"Ex
 - `sdlc_monitors`: `operation` list/events/define/activate/pause/poll; `id` identifies a monitor and `definition` is a locally authored object. Definitions require `id`, `name`, `provider` (jira/github/bitbucket), `connectionId`, `query`, and `intervalSeconds` (60–86400). Jira query requires `jql`; GitHub requires `owner`, `repo`, `pullRequestId`; Bitbucket requires `project`, `repo`, `pullRequestId`. Optional query `label` and `commentContains` are subject to provider restrictions. Optional `action` uses `kind` refine/implement, respectively `researchFocus` or `taskId`, optional `armed`, `estimate`, `timeoutSeconds`, `maxTokens`, `maxParallel`. Armed definitions require explicit host authorization. Implement cannot use Bitbucket or a comment filter and requires the exact `hanes-implement` label; first polling establishes baseline. Unarmed triggers remain pending for a direct human host action. Armed triggers require a prior explicit native host grant bound to the matching definition and trigger; ordinary human task approval still applies.
 - `sdlc_automation`: `operation` list/propose/dismiss; dismiss uses `id`. Propose uses `proposal` with `connectionId`, `operation` (create/update/createPullRequest/createComment), `params` object, and, for pull requests, `taskId` of an accepted delivery task. Proposals are frozen and run only via direct human host action.
 
-Example `sdlc_monitors`: `{"operation":"define","definition":{"id":"issues","name":"Issue research","provider":"jira","connectionId":"jira-main","query":{"jql":"project = EXAMPLE"},"intervalSeconds":300,"action":{"kind":"refine","researchFocus":"Clarify requirements","maxTokens":10000,"timeoutSeconds":300,"maxParallel":1}}}`. Activate with `{"operation":"activate","id":"issues"}` and inspect events with `{"operation":"events","id":"issues"}`. A monitor event is not approval.
+With a locally determined Fibonacci estimate of 8, example `sdlc_monitors`: `{"operation":"define","definition":{"id":"issues","name":"Issue research","provider":"jira","connectionId":"jira-main","query":{"jql":"project = EXAMPLE"},"intervalSeconds":300,"action":{"kind":"refine","researchFocus":"Clarify requirements","estimate":8,"maxTokens":10000,"timeoutSeconds":300,"maxParallel":1}}}`. Activate with `{"operation":"activate","id":"issues"}` and inspect events with `{"operation":"events","id":"issues"}`. A monitor event is not approval.
 
 Example `sdlc_automation`: `{"operation":"propose","proposal":{"connectionId":"github-main","operation":"createComment","params":{"owner":"example","repo":"app","pullRequestId":1,"body":"Proposed update"}}}`. Check provider parameters and the frozen proposal before the human runs it.
+
+### Provider parameters
+
+Pass these in `sdlc_connections` `params` with the appropriate operation and connection ID. Only listed operations are supported for each provider. Add the pagination fields above to paged operations.
+
+| Provider | Read operation | Parameters |
+| --- | --- | --- |
+| Jira | search | `jql` |
+| Jira | read, comments | `issueKey` |
+| Confluence | search | `cql` |
+| Confluence | read | `pageId` |
+| GitHub | pullRequests | `owner`, `repo` |
+| GitHub | readPullRequest, comments, reviewComments | `owner`, `repo`, `pullRequestId` |
+| Bitbucket | pullRequests | `project`, `repo` |
+| Bitbucket | readPullRequest, comments | `project`, `repo`, `pullRequestId` |
+
+Publication proposals use `params` as follows:
+
+| Provider and operation | Parameters |
+| --- | --- |
+| Confluence create | `spaceKey`, `title`, `body` (storage-format XHTML), optional `parentId` |
+| Confluence update | `pageId`, `title`, `body`, `version` (read current version first and add one) |
+| GitHub createPullRequest | `owner`, `repo`, `title`, `head`, `base`, optional `body` |
+| Bitbucket createPullRequest | `project`, `repo`, `title`, `head`, `base`, optional `body`; use full branch refs |
+| GitHub createComment | `owner`, `repo`, `pullRequestId`, `body` |
+| Bitbucket createComment | `project`, `repo`, `pullRequestId`, `body` |
+
+A pull-request proposal also needs an accepted local `taskId` and an already prepared and pushed branch; the integration neither creates branches nor pushes commits. Publication is outside monitor grants and requires human review followed by native confirmation of the destination and request.
