@@ -85,7 +85,8 @@ export async function run() {
       {role:'specify',purpose:'research',focus:'Data contract',executor:'example.quality.echo'}] }) as {team:string};
     let result: any[] = [];
     for(let i=0;i<100;i++){result=await api.invokeTool(folder,'sdlc_research',{operation:'status',id:team.team}) as any[];if(result[0].status!=='running')break;await new Promise(resolve=>setTimeout(resolve,25));}
-    assert.equal(result[0].status,'completed');assert.equal(result[0].artifacts.length,2);assert.equal(result[0].sessions.length,2);
+    if (result[0]?.status !== 'completed') console.error('Research diagnostics:', JSON.stringify(result, null, 2));
+    assert.equal(result[0].status, 'completed', `Research failed: ${JSON.stringify(result[0])}`);assert.equal(result[0].artifacts.length,2);assert.equal(result[0].sessions.length,2);
     const prototype = await api.invokeTool(folder,'sdlc_artifacts',{operation:'create',kind:'prototype',parent:initiative.id,title:'HTML discussion',body:'<!doctype html><html><body>Prototype</body></html>',data:{format:'html'}}) as {file:string};
     assert.match(await readFile(path.join(folder,prototype.file),'utf8'),/Prototype/);
     assert.ok(api.listModules().some(m=>m.id==='core.research'));
