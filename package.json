@@ -1123,5 +1123,6 @@
   "homepage": "https://github.com/bartekrozycki/vscode-haness",
   "bugs": {
     "url": "https://github.com/bartekrozycki/vscode-haness/issues"
-  }
+  },
+  "author": "Bartosz Różycki"
 }
