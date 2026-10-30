@@ -23,7 +23,7 @@ npm install
 npm run check
 npm test
 npm run package
-code --install-extension copilot-sdk-sdlc-darwin-arm64-0.6.0.vsix --force
+code --install-extension copilot-sdk-sdlc-darwin-arm64-0.7.1.vsix --force
 ```
 
 Packaging targets the current host platform and architecture because the SDK
