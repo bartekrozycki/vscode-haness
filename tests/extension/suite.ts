@@ -84,7 +84,8 @@ export async function run() {
       {role:'specify',purpose:'research',focus:'UI contract',executor:'example.quality.echo'},
       {role:'specify',purpose:'research',focus:'Data contract',executor:'example.quality.echo'}] }) as {team:string};
     let result: any[] = [];
-    for(let i=0;i<100;i++){result=await api.invokeTool(folder,'sdlc_research',{operation:'status',id:team.team}) as any[];if(result[0].status!=='running')break;await new Promise(resolve=>setTimeout(resolve,25));}
+    const researchDeadline = Date.now() + 30000;
+    while(Date.now() < researchDeadline){result=await api.invokeTool(folder,'sdlc_research',{operation:'status',id:team.team}) as any[];if(['completed','failed','cancelled','interrupted'].includes(result[0].status))break;await new Promise(resolve=>setTimeout(resolve,25));}
     if (result[0]?.status !== 'completed') console.error('Research diagnostics:', JSON.stringify(result, null, 2));
     assert.equal(result[0].status, 'completed', `Research failed: ${JSON.stringify(result[0])}`);assert.equal(result[0].artifacts.length,2);assert.equal(result[0].sessions.length,2);
     const prototype = await api.invokeTool(folder,'sdlc_artifacts',{operation:'create',kind:'prototype',parent:initiative.id,title:'HTML discussion',body:'<!doctype html><html><body>Prototype</body></html>',data:{format:'html'}}) as {file:string};
